@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import env from './config/env';
+import authRoutes from './routes/auth.routes';
+import { errorHandler } from './utils/errors.util';
 
 const app = express();
 
@@ -13,9 +15,12 @@ app.get('/health', (_, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Routes will be added here
-// app.use('/api/auth', authRoutes);
+// Routes
+app.use('/api/auth', authRoutes);
 // app.use('/api/debts', debtRoutes);
+
+// Error handler (debe ir al final)
+app.use(errorHandler);
 
 const PORT = parseInt(env.PORT, 10);
 
