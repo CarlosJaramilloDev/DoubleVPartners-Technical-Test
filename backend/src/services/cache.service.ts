@@ -25,8 +25,17 @@ export interface CacheItem {
   ttl: number;
 }
 
+export interface CacheList {
+  userId: string;
+  debtId: string; // Para listados usamos "list-{status}"
+  data: string; // JSON serializado de las deudas
+  lastUpdated: string;
+  ttl: number;
+}
+
 /**
  * Invalidar caché de un usuario (eliminar todos sus items de caché)
+ * Esto incluye tanto los items individuales como los listados
  */
 export const invalidateUserCache = async (userId: string): Promise<void> => {
   try {
@@ -41,10 +50,10 @@ export const invalidateUserCache = async (userId: string): Promise<void> => {
 
     const result = await dynamoDBClient.send(queryCommand);
 
-    // Eliminar cada item
+    // Eliminar cada item (incluye listados y items individuales)
     if (result.Items) {
       for (const item of result.Items) {
-        const unmarshalled = unmarshall(item) as CacheItem;
+        const unmarshalled = unmarshall(item) as CacheItem | CacheList;
         const deleteCommand = new DeleteItemCommand({
           TableName: TABLE_NAME,
           Key: marshall({
@@ -127,6 +136,66 @@ export const setCachedDebt = async (
   } catch (error) {
     // Si hay error, simplemente loguear pero no fallar
     console.error('Error setting cache:', error);
+  }
+};
+
+/**
+ * Obtener listado completo de deudas desde caché
+ */
+export const getCachedDebtsList = async (
+  userId: string,
+  status: 'pending' | 'paid' | 'all' = 'all'
+): Promise<any[] | null> => {
+  try {
+    const cacheKey = `list-${status}`;
+    const getCommand = new GetItemCommand({
+      TableName: TABLE_NAME,
+      Key: marshall({
+        userId,
+        debtId: cacheKey,
+      }),
+    });
+
+    const result = await dynamoDBClient.send(getCommand);
+
+    if (!result.Item) {
+      return null;
+    }
+
+    const item = unmarshall(result.Item) as CacheList;
+    return JSON.parse(item.data);
+  } catch (error) {
+    console.error('Error getting cached debts list:', error);
+    return null;
+  }
+};
+
+/**
+ * Guardar listado completo de deudas en caché
+ */
+export const setCachedDebtsList = async (
+  userId: string,
+  status: 'pending' | 'paid' | 'all',
+  debts: any[]
+): Promise<void> => {
+  try {
+    const cacheKey = `list-${status}`;
+    const item: CacheList = {
+      userId,
+      debtId: cacheKey,
+      data: JSON.stringify(debts),
+      lastUpdated: new Date().toISOString(),
+      ttl: getTTL(),
+    };
+
+    const putCommand = new PutItemCommand({
+      TableName: TABLE_NAME,
+      Item: marshall(item),
+    });
+
+    await dynamoDBClient.send(putCommand);
+  } catch (error) {
+    console.error('Error setting cached debts list:', error);
   }
 };
 

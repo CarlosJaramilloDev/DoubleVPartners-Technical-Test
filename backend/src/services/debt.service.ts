@@ -1,9 +1,24 @@
 import prisma from '../config/database';
 import { CreateDebtInput, UpdateDebtInput } from '../validators/debt.validator';
 import { AppError } from '../utils/errors.util';
-import { invalidateUserCache } from './cache.service';
+import { invalidateUserCache, getCachedDebtsList, setCachedDebtsList } from './cache.service';
+import logger from '../utils/logger';
 
 export const getDebtsByUser = async (userId: string, status?: 'pending' | 'paid' | 'all') => {
+  const cacheStatus = status || 'all';
+
+  // Intentar obtener del caché primero
+  try {
+    const cachedDebts = await getCachedDebtsList(userId, cacheStatus);
+    if (cachedDebts) {
+      logger.debug('Debts retrieved from cache', { userId, status: cacheStatus });
+      return cachedDebts;
+    }
+  } catch (error) {
+    logger.warn('Error reading from cache, falling back to database', { error });
+  }
+
+  // Si no hay caché, consultar la base de datos
   const where: any = {
     OR: [
       { creditorId: userId },
@@ -40,6 +55,14 @@ export const getDebtsByUser = async (userId: string, status?: 'pending' | 'paid'
       createdAt: 'desc',
     },
   });
+
+  // Guardar en caché para próximas consultas
+  try {
+    await setCachedDebtsList(userId, cacheStatus, debts);
+    logger.debug('Debts cached', { userId, status: cacheStatus, count: debts.length });
+  } catch (error) {
+    logger.warn('Error caching debts', { error });
+  }
 
   return debts;
 };
