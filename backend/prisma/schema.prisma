@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique @db.VarChar(255)
+  name         String   @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  
+  // Relaciones
+  debtsAsCreditor Debt[] @relation("Creditor")
+  debtsAsDebtor   Debt[] @relation("Debtor")
+
+  @@map("users")
+}
+
+model Debt {
+  id          String    @id @default(uuid())
+  creditorId  String    @map("creditor_id")
+  debtorId    String    @map("debtor_id")
+  amount      Decimal   @db.Decimal(10, 2)
+  description String?   @db.Text
+  isPaid      Boolean   @default(false) @map("is_paid")
+  paidAt      DateTime? @map("paid_at") @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relaciones
+  creditor User @relation("Creditor", fields: [creditorId], references: [id], onDelete: Cascade)
+  debtor   User @relation("Debtor", fields: [debtorId], references: [id], onDelete: Cascade)
+
+  @@index([creditorId])
+  @@index([debtorId])
+  @@index([isPaid])
+  @@map("debts")
+}
+
