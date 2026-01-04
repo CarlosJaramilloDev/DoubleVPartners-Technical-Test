@@ -439,6 +439,113 @@ curl -X PATCH http://localhost:3000/api/debts/DEBT_ID/pay \
 
 ---
 
+### GET /api/debts/export
+
+Exporta las deudas del usuario autenticado en formato JSON o CSV.
+
+**Request:**
+```bash
+curl -X GET "http://localhost:3000/api/debts/export?format=json" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Query Parameters:**
+- `format` (optional): Formato de exportación
+  - `json` (default): Exporta como JSON
+  - `csv`: Exporta como CSV
+- `status` (optional): Filtro por estado
+  - `pending`: Solo deudas pendientes
+  - `paid`: Solo deudas pagadas
+  - `all` o sin parámetro: Todas las deudas
+
+**Ejemplos:**
+```bash
+# Exportar como JSON (por defecto)
+curl -X GET "http://localhost:3000/api/debts/export" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Exportar como CSV
+curl -X GET "http://localhost:3000/api/debts/export?format=csv" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Exportar solo pendientes en CSV
+curl -X GET "http://localhost:3000/api/debts/export?format=csv&status=pending" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Exportar solo pagadas en JSON
+curl -X GET "http://localhost:3000/api/debts/export?format=json&status=paid" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response 200 (JSON):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "creditorName": "John Doe",
+      "creditorEmail": "john@example.com",
+      "debtorName": "Jane Smith",
+      "debtorEmail": "jane@example.com",
+      "amount": "150.50",
+      "description": "Almuerzo del viernes",
+      "isPaid": false,
+      "paidAt": null,
+      "createdAt": "2024-01-04T12:00:00.000Z"
+    }
+  ],
+  "count": 1
+}
+```
+
+**Response 200 (CSV):**
+```
+ID,Acreedor,Email Acreedor,Deudor,Email Deudor,Monto,Descripción,Pagada,Fecha Pago,Fecha Creación
+uuid,John Doe,john@example.com,Jane Smith,jane@example.com,150.50,Almuerzo del viernes,No,,2024-01-04T12:00:00.000Z
+```
+
+**Headers de respuesta:**
+- `Content-Type`: `application/json` o `text/csv`
+- `Content-Disposition`: `attachment; filename="deudas-[timestamp].json"` o `attachment; filename="deudas-[timestamp].csv"`
+
+---
+
+### GET /api/debts/stats
+
+Obtiene estadísticas agregadas de las deudas del usuario autenticado.
+
+**Request:**
+```bash
+curl -X GET http://localhost:3000/api/debts/stats \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "totalPaid": 250.50,
+    "totalPending": 150.00,
+    "totalDebts": 5,
+    "paidCount": 2,
+    "pendingCount": 3
+  }
+}
+```
+
+**Campos de respuesta:**
+- `totalPaid` (number): Suma total de deudas pagadas
+- `totalPending` (number): Suma total de deudas pendientes (saldo pendiente)
+- `totalDebts` (number): Total de deudas (pagadas + pendientes)
+- `paidCount` (number): Cantidad de deudas pagadas
+- `pendingCount` (number): Cantidad de deudas pendientes
+
+**Nota:** Las deudas se cuentan tanto cuando el usuario es acreedor como cuando es deudor.
+
+---
+
 ## Endpoint de Health Check
 
 ### GET /health
@@ -521,4 +628,5 @@ curl -X GET http://localhost:3000/api/debts \
    - Solo el acreedor puede editar/eliminar deudas
 3. **UUIDs**: Todos los IDs son UUIDs v4
 4. **Montos**: Se almacenan como Decimal en la base de datos, se envían como números en JSON
+5. **DynamoDB**: El servicio de caché está preparado pero aún no está integrado activamente en las consultas. Se invalidará automáticamente cuando se creen/editen/paguen deudas.
 

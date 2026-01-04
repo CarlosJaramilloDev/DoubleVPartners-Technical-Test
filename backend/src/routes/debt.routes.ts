@@ -7,6 +7,8 @@ import {
   deleteDebtController,
   payDebt,
 } from '../controllers/debt.controller';
+import { exportDebts } from '../controllers/export.controller';
+import { getStats } from '../controllers/stats.controller';
 import { authenticate } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -15,6 +17,8 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/', listDebts);
+router.get('/export', exportDebts);
+router.get('/stats', getStats);
 router.get('/:id', getDebt);
 router.post('/', createDebtController);
 router.put('/:id', updateDebtController);
