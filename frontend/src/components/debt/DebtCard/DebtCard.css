@@ -1,0 +1,82 @@
+.debt-card {
+  margin-bottom: var(--spacing-md);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.debt-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.debt-card--paid {
+  opacity: 0.7;
+}
+
+.debt-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--color-background);
+}
+
+.debt-card__amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.debt-card--paid .debt-card__amount {
+  color: var(--color-text-secondary);
+}
+
+.debt-card__status {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.debt-card__status--pending {
+  background-color: #fff3e0;
+  color: var(--color-warning);
+}
+
+.debt-card__status--paid {
+  background-color: #e8f5e9;
+  color: var(--color-success);
+}
+
+.debt-card__body {
+  margin-bottom: var(--spacing-md);
+}
+
+.debt-card__info {
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text-primary);
+}
+
+.debt-card__info strong {
+  color: var(--color-primary);
+}
+
+.debt-card__description {
+  margin: var(--spacing-sm) 0;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.debt-card__date {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: var(--spacing-xs) 0;
+}
+
+.debt-card__actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
