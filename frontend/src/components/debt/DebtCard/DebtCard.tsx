@@ -1,4 +1,4 @@
-import { Debt } from '../../../types/debt.types';
+import type { Debt } from '../../../types/debt.types';
 import { useAuth } from '../../../context/AuthContext';
 import { Card } from '../../common/Card/Card';
 import { Button } from '../../common/Button/Button';

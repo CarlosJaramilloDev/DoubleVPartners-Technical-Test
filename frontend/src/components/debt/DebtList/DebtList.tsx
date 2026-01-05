@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Debt, DebtStatus } from '../../../types/debt.types';
+import type { Debt, DebtStatus } from '../../../types/debt.types';
 import { getDebts, markDebtAsPaid, deleteDebt } from '../../../services/debt.service';
 import { DebtCard } from '../DebtCard/DebtCard';
 import { Loading } from '../../common/Loading/Loading';

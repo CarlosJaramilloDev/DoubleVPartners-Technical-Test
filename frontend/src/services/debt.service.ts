@@ -1,6 +1,6 @@
 import api from './api';
 import { API_ENDPOINTS, DEBT_STATUS } from '../utils/constants';
-import { Debt, CreateDebtInput, UpdateDebtInput, DebtStatus } from '../types/debt.types';
+import type { Debt, CreateDebtInput, UpdateDebtInput, DebtStatus } from '../types/debt.types';
 
 export const getDebts = async (status?: DebtStatus): Promise<Debt[]> => {
   const params = status && status !== DEBT_STATUS.ALL ? { status } : {};

@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/common/Button/Button';
 import { DebtList } from '../components/debt/DebtList/DebtList';
 import { DebtForm } from '../components/debt/DebtForm/DebtForm';
-import { Debt } from '../types/debt.types';
+import type { Debt } from '../types/debt.types';
 import './Dashboard.css';
 
 const Dashboard = () => {

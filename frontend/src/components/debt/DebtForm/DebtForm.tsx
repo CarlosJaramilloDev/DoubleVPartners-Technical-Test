@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Debt, CreateDebtInput, UpdateDebtInput } from '../../../types/debt.types';
+import type { Debt, CreateDebtInput, UpdateDebtInput } from '../../../types/debt.types';
 import { createDebt, updateDebt } from '../../../services/debt.service';
 import { Input } from '../../common/Input/Input';
 import { Button } from '../../common/Button/Button';
