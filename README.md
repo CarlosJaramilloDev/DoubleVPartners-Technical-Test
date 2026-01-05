@@ -6,10 +6,9 @@ Sistema de gestión de deudas entre amigos desarrollado como prueba técnica.
 
 ```
 double-v-technical-pr/
-└── backend/          # API REST en Node.js + Express
+├── backend/          # API REST en Node.js + Express
+└── frontend/         # Aplicación React + TypeScript + Vite
 ```
-
-> **Nota:** El frontend se desarrollará después de completar el backend.
 
 ## 🚀 Inicio Rápido
 
@@ -23,8 +22,18 @@ npm run dev
 
 Ver [Backend README](./backend/README.md) para instrucciones detalladas.
 
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Ver [Frontend README](./frontend/README.md) para instrucciones detalladas.
+
 ## 🛠️ Stack Tecnológico
 
 - **Backend:** Node.js, Express, Prisma, PostgreSQL (Supabase), DynamoDB
-- **Frontend:** React, TypeScript, Vite (pendiente)
+- **Frontend:** React, TypeScript, Vite, React Router, Axios
 
