@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import { STORAGE_KEYS } from '../utils/constants';
 
 export interface User {
@@ -30,25 +30,29 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Cargar datos del localStorage al iniciar
-    const storedToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
-    const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
+  const loadStoredAuth = () => {
+    try {
+      const storedToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
+      const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
 
-    if (storedToken && storedUser) {
-      try {
-        setToken(storedToken);
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error('Error parsing stored user data:', error);
-        localStorage.removeItem(STORAGE_KEYS.TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.USER);
+      if (storedToken && storedUser) {
+        return {
+          token: storedToken,
+          user: JSON.parse(storedUser) as User,
+        };
       }
+    } catch (error) {
+      console.error('Error parsing stored user data:', error);
+      localStorage.removeItem(STORAGE_KEYS.TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.USER);
     }
-  }, []);
+    return { token: null, user: null };
+  };
+
+  const storedAuth = loadStoredAuth();
+  const [user, setUser] = useState<User | null>(storedAuth.user);
+  const [token, setToken] = useState<string | null>(storedAuth.token);
 
   const login = (newToken: string, newUser: User) => {
     setToken(newToken);
