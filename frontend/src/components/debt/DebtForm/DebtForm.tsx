@@ -2,16 +2,18 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import type { Debt, CreateDebtInput, UpdateDebtInput } from '../../../types/debt.types';
+import type { Debt, CreateDebtInput, UpdateDebtInput, User } from '../../../types/debt.types';
 import { createDebt, updateDebt } from '../../../services/debt.service';
+import { getUsers } from '../../../services/user.service';
 import { Input } from '../../common/Input/Input';
+import { Select } from '../../common/Select/Select';
 import { Button } from '../../common/Button/Button';
 import { Card } from '../../common/Card/Card';
 import './DebtForm.css';
 
 const debtSchema = z.object({
-  debtorId: z.string().uuid('Debe ser un UUID válido'),
-  amount: z.number().min(0.01, 'El monto debe ser mayor a 0'),
+  debtorId: z.string().uuid('Debe seleccionar un deudor'),
+  amount: z.number().min(1, 'El monto debe ser mayor a 0'),
   description: z.string().optional(),
 });
 
@@ -26,7 +28,28 @@ interface DebtFormProps {
 export const DebtForm = ({ debt, onSuccess, onCancel }: DebtFormProps) => {
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
   const isEditing = !!debt;
+
+  useEffect(() => {
+    if (!isEditing) {
+      loadUsers();
+    }
+  }, [isEditing]);
+
+  const loadUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const usersList = await getUsers();
+      setUsers(usersList);
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Error al cargar usuarios');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
 
   const {
     register,
@@ -74,8 +97,9 @@ export const DebtForm = ({ debt, onSuccess, onCancel }: DebtFormProps) => {
         await createDebt(createData);
       }
       onSuccess();
-    } catch (err: any) {
-      setError(err.response?.data?.message || `Error al ${isEditing ? 'actualizar' : 'crear'} la deuda`);
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || `Error al ${isEditing ? 'actualizar' : 'crear'} la deuda`);
     } finally {
       setLoading(false);
     }
@@ -89,21 +113,24 @@ export const DebtForm = ({ debt, onSuccess, onCancel }: DebtFormProps) => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="debt-form__form">
         {!isEditing && (
-          <Input
-            label="ID del Deudor (UUID)"
-            type="text"
-            placeholder="123e4567-e89b-12d3-a456-426614174000"
+          <Select
+            label="Deudor"
+            options={users.map((user) => ({
+              value: user.id,
+              label: `${user.name} (${user.email})`,
+            }))}
             error={errors.debtorId?.message}
+            disabled={loadingUsers}
             {...register('debtorId')}
           />
         )}
 
         <Input
-          label="Monto"
+          label="Monto (COP)"
           type="number"
-          step="0.01"
-          min="0.01"
-          placeholder="150.50"
+          step="1"
+          min="1"
+          placeholder="10000"
           error={errors.amount?.message}
           {...register('amount', { valueAsNumber: true })}
         />

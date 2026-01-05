@@ -2,6 +2,7 @@ import type { Debt } from '../../../types/debt.types';
 import { useAuth } from '../../../context/AuthContext';
 import { Card } from '../../common/Card/Card';
 import { Button } from '../../common/Button/Button';
+import { formatCurrencyCOP } from '../../../utils/format.util';
 import './DebtCard.css';
 
 interface DebtCardProps {
@@ -20,10 +21,7 @@ export const DebtCard = ({ debt, onPay, onEdit, onDelete }: DebtCardProps) => {
   const canPay = isDebtor && !debt.isPaid;
 
   const formatAmount = (amount: string) => {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-    }).format(parseFloat(amount));
+    return formatCurrencyCOP(amount);
   };
 
   const formatDate = (dateString: string) => {
