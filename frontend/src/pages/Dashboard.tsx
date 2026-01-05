@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/common/Button/Button';
 import { DebtList } from '../components/debt/DebtList/DebtList';
 import { DebtForm } from '../components/debt/DebtForm/DebtForm';
+import { DebtStats } from '../components/debt/DebtStats/DebtStats';
 import type { Debt } from '../types/debt.types';
 import './Dashboard.css';
 
@@ -10,11 +11,18 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editingDebt, setEditingDebt] = useState<Debt | undefined>(undefined);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleFormSuccess = () => {
     setShowForm(false);
     setEditingDebt(undefined);
-    // El DebtList se recargará automáticamente cuando cambie el estado
+    // Actualizar estadísticas y lista cuando cambien las deudas
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
+  const handleDebtChange = () => {
+    // Actualizar estadísticas y lista cuando cambien las deudas
+    setRefreshTrigger((prev) => prev + 1);
   };
 
   const handleEdit = (debt: Debt) => {
@@ -40,6 +48,8 @@ const Dashboard = () => {
       </header>
 
       <main className="dashboard-main">
+        <DebtStats refreshTrigger={refreshTrigger} />
+
         <div className="dashboard-actions">
           {!showForm && (
             <Button variant="primary" onClick={() => setShowForm(true)}>
@@ -56,7 +66,11 @@ const Dashboard = () => {
           />
         )}
 
-        <DebtList onEdit={handleEdit} />
+        <DebtList 
+          onEdit={handleEdit} 
+          onDebtChange={handleDebtChange}
+          refreshTrigger={refreshTrigger}
+        />
       </main>
     </div>
   );

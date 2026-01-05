@@ -1,0 +1,104 @@
+.debt-stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.debt-stats {
+  margin-bottom: 0;
+}
+
+.debt-stats__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.debt-stats__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.debt-stats__item {
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  text-align: center;
+  background-color: var(--color-background);
+}
+
+.debt-stats__item--pending {
+  border-left: 4px solid var(--color-warning);
+}
+
+.debt-stats__item--paid {
+  border-left: 4px solid var(--color-success);
+}
+
+.debt-stats__item--total {
+  border-left: 4px solid var(--color-primary);
+}
+
+.debt-stats__item--owed {
+  border-left: 4px solid var(--color-success);
+}
+
+.debt-stats__item--owed-paid {
+  border-left: 4px solid var(--color-success);
+  opacity: 0.8;
+}
+
+.debt-stats__item--owe {
+  border-left: 4px solid var(--color-error);
+}
+
+.debt-stats__item--owe-paid {
+  border-left: 4px solid var(--color-error);
+  opacity: 0.8;
+}
+
+.debt-stats__sub-label {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+.debt-stats__label {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+}
+
+.debt-stats__value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.debt-stats__item--pending .debt-stats__value {
+  color: var(--color-warning);
+}
+
+.debt-stats__item--paid .debt-stats__value {
+  color: var(--color-success);
+}
+
+.debt-stats__item--total .debt-stats__value {
+  color: var(--color-primary);
+}
+
+.debt-stats__count {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.debt-stats__error {
+  color: var(--color-error);
+  text-align: center;
+  padding: var(--spacing-md);
+}
+

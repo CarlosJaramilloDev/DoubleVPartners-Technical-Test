@@ -9,9 +9,11 @@ import './DebtList.css';
 
 interface DebtListProps {
   onEdit?: (debt: Debt) => void;
+  onDebtChange?: () => void; // Callback cuando cambian las deudas
+  refreshTrigger?: number; // Se incrementa cuando se crean/editan deudas
 }
 
-export const DebtList = ({ onEdit }: DebtListProps) => {
+export const DebtList = ({ onEdit, onDebtChange, refreshTrigger = 0 }: DebtListProps) => {
   const [debts, setDebts] = useState<Debt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
@@ -23,8 +25,9 @@ export const DebtList = ({ onEdit }: DebtListProps) => {
     try {
       const data = await getDebts(statusFilter);
       setDebts(data);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar las deudas');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Error al cargar las deudas');
     } finally {
       setLoading(false);
     }
@@ -32,14 +35,16 @@ export const DebtList = ({ onEdit }: DebtListProps) => {
 
   useEffect(() => {
     loadDebts();
-  }, [statusFilter]);
+  }, [statusFilter, refreshTrigger]);
 
   const handlePay = async (id: string) => {
     try {
       await markDebtAsPaid(id);
       await loadDebts();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al marcar la deuda como pagada');
+      onDebtChange?.(); // Notificar cambio para actualizar estadísticas
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Error al marcar la deuda como pagada');
     }
   };
 
@@ -51,8 +56,10 @@ export const DebtList = ({ onEdit }: DebtListProps) => {
     try {
       await deleteDebt(id);
       await loadDebts();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al eliminar la deuda');
+      onDebtChange?.(); // Notificar cambio para actualizar estadísticas
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Error al eliminar la deuda');
     }
   };
 
