@@ -23,6 +23,7 @@ const Register = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
   const {
@@ -35,16 +36,23 @@ const Register = () => {
 
   const onSubmit = async (data: RegisterFormData) => {
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
       const response = await api.post(API_ENDPOINTS.AUTH.REGISTER, data);
       const { token, user } = response.data.data;
 
-      login(token, user);
-      navigate('/');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al registrarse');
+      setSuccess('Usuario registrado con éxito');
+      
+      // Esperar un momento para mostrar el mensaje de éxito
+      setTimeout(() => {
+        login(token, user);
+        navigate('/');
+      }, 1000);
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Error al registrarse');
     } finally {
       setLoading(false);
     }
@@ -57,6 +65,7 @@ const Register = () => {
         <p className="auth-subtitle">Únete a DoubleV</p>
 
         {error && <div className="auth-error">{error}</div>}
+        {success && <div className="auth-success">{success}</div>}
 
         <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
           <Input
