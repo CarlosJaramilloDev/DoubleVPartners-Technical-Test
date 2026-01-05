@@ -18,7 +18,7 @@ export const DebtCard = ({ debt, onPay, onEdit, onDelete }: DebtCardProps) => {
   const isDebtor = user?.id === debt.debtorId;
   const canEdit = isCreditor && !debt.isPaid;
   const canDelete = isCreditor && !debt.isPaid;
-  const canPay = isDebtor && !debt.isPaid;
+  const canPay = isCreditor && !debt.isPaid;
 
   const formatAmount = (amount: string) => {
     return formatCurrencyCOP(amount);

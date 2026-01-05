@@ -231,19 +231,16 @@ export const deleteDebt = async (debtId: string, userId: string) => {
 };
 
 export const markDebtAsPaid = async (debtId: string, userId: string) => {
-  // Buscar la deuda y verificar permisos
+  // Buscar la deuda y verificar permisos (solo el acreedor puede marcar como pagada)
   const debt = await prisma.debt.findFirst({
     where: {
       id: debtId,
-      OR: [
-        { creditorId: userId },
-        { debtorId: userId },
-      ],
+      creditorId: userId, // Solo el acreedor puede marcar como pagada
     },
   });
 
   if (!debt) {
-    throw new AppError(404, 'Debt not found');
+    throw new AppError(404, 'Debt not found or you do not have permission to mark it as paid');
   }
 
   if (debt.isPaid) {
