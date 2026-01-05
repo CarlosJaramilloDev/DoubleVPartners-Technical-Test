@@ -35,9 +35,9 @@
   padding: var(--spacing-xl);
 }
 
-.dashboard-note {
-  color: var(--color-text-secondary);
-  font-style: italic;
-  margin-top: var(--spacing-md);
+.dashboard-actions {
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  justify-content: flex-end;
 }
 

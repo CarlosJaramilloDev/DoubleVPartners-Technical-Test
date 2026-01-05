@@ -1,10 +1,31 @@
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/common/Button/Button';
-import { Card } from '../components/common/Card/Card';
+import { DebtList } from '../components/debt/DebtList/DebtList';
+import { DebtForm } from '../components/debt/DebtForm/DebtForm';
+import { Debt } from '../types/debt.types';
 import './Dashboard.css';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
+  const [showForm, setShowForm] = useState(false);
+  const [editingDebt, setEditingDebt] = useState<Debt | undefined>(undefined);
+
+  const handleFormSuccess = () => {
+    setShowForm(false);
+    setEditingDebt(undefined);
+    // El DebtList se recargará automáticamente cuando cambie el estado
+  };
+
+  const handleEdit = (debt: Debt) => {
+    setEditingDebt(debt);
+    setShowForm(true);
+  };
+
+  const handleCancel = () => {
+    setShowForm(false);
+    setEditingDebt(undefined);
+  };
 
   return (
     <div className="dashboard-container">
@@ -19,13 +40,23 @@ const Dashboard = () => {
       </header>
 
       <main className="dashboard-main">
-        <Card>
-          <h2>Bienvenido al Dashboard</h2>
-          <p>Aquí podrás gestionar tus deudas.</p>
-          <p className="dashboard-note">
-            Esta página está en construcción. Próximamente podrás ver y gestionar tus deudas aquí.
-          </p>
-        </Card>
+        <div className="dashboard-actions">
+          {!showForm && (
+            <Button variant="primary" onClick={() => setShowForm(true)}>
+              + Nueva Deuda
+            </Button>
+          )}
+        </div>
+
+        {showForm && (
+          <DebtForm
+            debt={editingDebt}
+            onSuccess={handleFormSuccess}
+            onCancel={handleCancel}
+          />
+        )}
+
+        <DebtList onEdit={handleEdit} />
       </main>
     </div>
   );
