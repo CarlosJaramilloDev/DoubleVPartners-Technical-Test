@@ -3,6 +3,7 @@ import cors from 'cors';
 import env from './config/env';
 import authRoutes from './routes/auth.routes';
 import debtRoutes from './routes/debt.routes';
+import userRoutes from './routes/user.routes';
 import { errorHandler } from './utils/errors.util';
 import { requestLogger } from './middleware/logger.middleware';
 import logger from './utils/logger';
@@ -22,6 +23,7 @@ app.get('/health', (_, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/debts', debtRoutes);
+app.use('/api/users', userRoutes);
 
 // Error handler (debe ir al final)
 app.use(errorHandler);
